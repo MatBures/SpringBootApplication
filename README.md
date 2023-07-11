@@ -1,2 +1,2 @@
 # UML Logic diagram
-![LogicDiagram.png](src/main/resources/LogicDiagram.png)
+![LogicDiagram.png](docs/LogicDiagram.png)
