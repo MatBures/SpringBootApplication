@@ -1,9 +1,12 @@
 package org.firstPF.entities;
 
 import jakarta.persistence.*;
+
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 public class Offer {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -27,6 +30,9 @@ public class Offer {
     @ManyToOne
     @JoinColumn(name = "customer_id")
     private Customer customer;
+
+    @ManyToMany(mappedBy = "offers")
+    private Set<Employee> employees = new HashSet<>();
 
     // Getters and Setters
 

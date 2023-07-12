@@ -3,10 +3,11 @@ package org.firstPF.entities;
 import jakarta.persistence.*;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Employee {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -30,8 +31,16 @@ public class Employee {
     @JoinColumn(name = "provider_id")
     private Provider provider;
 
-    // Getters and Setters
+    @ManyToMany
+    @JoinTable(
+            name = "employee_offer",
+            joinColumns = @JoinColumn(name = "employee_id"),
+            inverseJoinColumns = @JoinColumn(name = "offer_id")
+    )
 
+    private Set<Offer> offers = new HashSet<>();
+
+    // Getters and Setters
     public long getId() {
         return id;
     }
