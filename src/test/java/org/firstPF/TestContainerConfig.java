@@ -7,9 +7,9 @@ public class TestContainerConfig {
 
     @ClassRule
     public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:latest")
-            .withDatabaseName("test")
-            .withUsername("test")
-            .withPassword("test");
+            .withDatabaseName("postgres")
+            .withUsername("postgres")
+            .withPassword("admin");
 
 
 }
