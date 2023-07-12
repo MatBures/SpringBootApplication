@@ -2,20 +2,16 @@ package org.firstPF.entities;
 
 import jakarta.persistence.*;
 
-import java.util.Date;
-
 @Entity
-public class OfferDelivery {
-
+@Table(name = "employee_offer")
+public class EmployeeOffer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "delivery_date")
-    private Date deliveryDate;
-
-    @Column(name = "accepted")
-    private boolean accepted;
+    @ManyToOne
+    @JoinColumn(name = "employee_id")
+    private Employee employee;
 
     @ManyToOne
     @JoinColumn(name = "offer_id")
@@ -31,20 +27,12 @@ public class OfferDelivery {
         this.id = id;
     }
 
-    public Date getDeliveryDate() {
-        return deliveryDate;
+    public Employee getEmployee() {
+        return employee;
     }
 
-    public void setDeliveryDate(Date deliveryDate) {
-        this.deliveryDate = deliveryDate;
-    }
-
-    public boolean isAccepted() {
-        return accepted;
-    }
-
-    public void setAccepted(boolean accepted) {
-        this.accepted = accepted;
+    public void setEmployee(Employee employee) {
+        this.employee = employee;
     }
 
     public Offer getOffer() {
