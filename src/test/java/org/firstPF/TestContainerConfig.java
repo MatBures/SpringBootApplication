@@ -5,11 +5,13 @@ import org.testcontainers.containers.PostgreSQLContainer;
 
 public class TestContainerConfig {
 
-    @ClassRule
-    public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:latest")
-            .withDatabaseName("postgres")
-            .withUsername("postgres")
-            .withPassword("admin");
+    public static PostgreSQLContainer<?> postgreSQLContainer;
 
-
+    static {
+        postgreSQLContainer = new PostgreSQLContainer<>("postgres:latest")
+                .withDatabaseName("postgres")
+                .withUsername("postgres")
+                .withPassword("admin");
+        postgreSQLContainer.start();
+    }
 }
