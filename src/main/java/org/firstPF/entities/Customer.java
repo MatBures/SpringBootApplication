@@ -7,7 +7,7 @@ public class Customer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(name = "name")
     private String name;
@@ -18,12 +18,12 @@ public class Customer {
     @Column(name = "contact_number")
     private String contactNumber;
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
     // Getters and Setters
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
