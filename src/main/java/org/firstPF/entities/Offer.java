@@ -9,7 +9,7 @@ import java.util.Set;
 public class Offer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(name = "title")
     private String title;
@@ -18,7 +18,7 @@ public class Offer {
     private String description;
 
     @Column(name = "cost")
-    private long cost;
+    private Long cost;
 
     @Column(name = "status")
     private String status;
@@ -36,7 +36,7 @@ public class Offer {
 
     // Getters and Setters
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
