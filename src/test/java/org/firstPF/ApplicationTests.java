@@ -10,6 +10,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 
 @SpringBootTest
 @Testcontainers
+public
 class ApplicationTests {
 
 	@Container
