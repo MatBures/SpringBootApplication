@@ -2,7 +2,7 @@ package org.firstPF.entities;
 
 import jakarta.persistence.*;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 public class OfferDelivery {
@@ -12,7 +12,7 @@ public class OfferDelivery {
     private Long id;
 
     @Column(name = "delivery_date")
-    private Date deliveryDate;
+    private LocalDate deliveryDate;
 
     @Column(name = "accepted")
     private boolean accepted;
@@ -31,11 +31,11 @@ public class OfferDelivery {
         this.id = id;
     }
 
-    public Date getDeliveryDate() {
+    public LocalDate getDeliveryDate() {
         return deliveryDate;
     }
 
-    public void setDeliveryDate(Date deliveryDate) {
+    public void setDeliveryDate(LocalDate deliveryDate) {
         this.deliveryDate = deliveryDate;
     }
 
