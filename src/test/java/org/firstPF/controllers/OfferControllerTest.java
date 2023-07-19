@@ -1,4 +1,4 @@
-package org.firstPF.controllersTest;
+package org.firstPF.controllers;
 
 import org.springframework.boot.test.context.SpringBootTest;
 

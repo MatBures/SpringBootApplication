@@ -1,8 +1,7 @@
-package org.firstPF.repositoriesTest;
+package org.firstPF.repositories;
 
 import org.firstPF.ApplicationTests;
 import org.firstPF.entities.Employee;
-import org.firstPF.repositories.EmployeeRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,7 +28,7 @@ public class EmployeeRepositoryTest extends ApplicationTests {
     }
 
     @Test
-    public void testFindById() {
+    public void testSaveAndFindById() {
         Employee employee = new Employee();
         employee.setFirstName("John");
         employee.setLastName("Doe");
@@ -46,26 +45,5 @@ public class EmployeeRepositoryTest extends ApplicationTests {
         Assertions.assertEquals(employee.getEmail(), result.get().getEmail());
         Assertions.assertEquals(employee.getDateOfBirth(), result.get().getDateOfBirth());
         Assertions.assertEquals(employee.getContactNumber(), result.get().getContactNumber());
-    }
-
-    @Test
-    public void testSave() {
-        Employee employee = new Employee();
-        employee.setFirstName("Jane");
-        employee.setLastName("Smith");
-        employee.setEmail("jane.smith@example.com");
-        employee.setDateOfBirth(LocalDate.of(1990, 1, 1));
-        employee.setContactNumber("9876543210");
-
-        Employee savedEmployee = employeeRepository.save(employee);
-
-        Assertions.assertNotNull(savedEmployee.getId());
-
-        Employee retrievedEmployee = employeeRepository.findById(savedEmployee.getId()).get();
-        Assertions.assertEquals(employee.getFirstName(), retrievedEmployee.getFirstName());
-        Assertions.assertEquals(employee.getLastName(), retrievedEmployee.getLastName());
-        Assertions.assertEquals(employee.getEmail(), retrievedEmployee.getEmail());
-        Assertions.assertEquals(employee.getDateOfBirth(), retrievedEmployee.getDateOfBirth());
-        Assertions.assertEquals(employee.getContactNumber(), retrievedEmployee.getContactNumber());
     }
 }

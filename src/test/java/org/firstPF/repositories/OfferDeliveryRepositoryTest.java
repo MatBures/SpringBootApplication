@@ -1,8 +1,7 @@
-package org.firstPF.repositoriesTest;
+package org.firstPF.repositories;
 
 import org.firstPF.ApplicationTests;
 import org.firstPF.entities.OfferDelivery;
-import org.firstPF.repositories.OfferDeliveryRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,7 +25,7 @@ public class OfferDeliveryRepositoryTest extends ApplicationTests {
     }
 
     @Test
-    public void testFindById() {
+    public void testSaveAndFindById() {
         OfferDelivery offerDelivery = new OfferDelivery();
         offerDelivery.setDeliveryDate(LocalDate.of(2023, 1, 1));
         offerDelivery.setAccepted(true);
@@ -37,20 +36,5 @@ public class OfferDeliveryRepositoryTest extends ApplicationTests {
         Assertions.assertTrue(result.isPresent());
         Assertions.assertEquals(offerDelivery.getDeliveryDate(), result.get().getDeliveryDate());
         Assertions.assertEquals(offerDelivery.isAccepted(), result.get().isAccepted());
-    }
-
-    @Test
-    public void testSave() {
-        OfferDelivery offerDelivery = new OfferDelivery();
-        offerDelivery.setDeliveryDate(LocalDate.of(2023, 1, 1));
-        offerDelivery.setAccepted(true);
-
-        OfferDelivery savedOfferDelivery = offerDeliveryRepository.save(offerDelivery);
-
-        Assertions.assertNotNull(savedOfferDelivery.getId());
-
-        OfferDelivery retrievedOfferDelivery = offerDeliveryRepository.findById(savedOfferDelivery.getId()).get();
-        Assertions.assertEquals(offerDelivery.getDeliveryDate(), retrievedOfferDelivery.getDeliveryDate());
-        Assertions.assertEquals(offerDelivery.isAccepted(), retrievedOfferDelivery.isAccepted());
     }
 }

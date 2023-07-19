@@ -1,7 +1,7 @@
-package org.firstPF.controllersTest;
+package org.firstPF.services;
 
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-public class EmployeeControllerTest {
+public class OfferServiceTest {
 }
