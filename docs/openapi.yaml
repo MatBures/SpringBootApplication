@@ -1,0 +1,833 @@
+openapi: 3.0.0
+info:
+  title: IT Service Offers API
+  version: 1.0.0
+paths:
+  /customers:
+    get:
+      summary: Retrieve all customers
+      operationId: getAllCustomers
+      responses:
+        '200':
+          description: Customers retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Customer'
+        '404':
+          description: Not Found - No customers found
+      tags:
+        - Customers
+
+    post:
+      summary: Create a new customer
+      operationId: createCustomer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostCustomer'
+      responses:
+        '201':
+          description: Customer created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '400':
+          description: Bad Request - Invalid input data
+      tags:
+        - Customers
+
+  /customers/{id}:
+    get:
+      summary: Retrieve customer information by ID
+      operationId: getCustomer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Customer ID
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Customer information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '404':
+          description: Not Found - Customer with given ID not found
+      tags:
+        - Customers
+
+    put:
+      summary: Update customer information by ID
+      operationId: updateCustomer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Customer ID
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Customer'
+      responses:
+        '200':
+          description: Customer updated successfully
+        '404':
+          description: Not Found - Customer with given ID not found
+      tags:
+        - Customers
+
+    delete:
+      summary: Delete a customer by ID
+      operationId: deleteCustomer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Customer ID
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Customer deleted successfully
+        '404':
+          description: Not Found - Customer with given ID not found
+      tags:
+        - Customers
+
+  /employees:
+    get:
+      summary: Retrieve all employees
+      operationId: getAllEmployees
+      responses:
+        '200':
+          description: Employees retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EmployeeWithProvider'
+        '404':
+          description: Not Found - No employees found
+      tags:
+        - Employees
+
+    post:
+      summary: Create a new employee
+      operationId: createEmployee
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostEmployee'
+      responses:
+        '201':
+          description: Employee created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmployeeWithProvider'
+        '400':
+          description: Bad Request - Invalid input data
+      tags:
+        - Employees
+
+  /employees/{id}:
+    get:
+      summary: Retrieve employee information by ID
+      operationId: getEmployee
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Employee ID
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Employee information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmployeeWithProvider'
+        '404':
+          description: Not Found - Employee with given ID not found
+      tags:
+        - Employees
+
+    put:
+      summary: Update employee information by ID
+      operationId: updateEmployee
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Employee ID
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEmployee'
+      responses:
+        '200':
+          description: Employee updated successfully
+        '404':
+          description: Not Found - Employee with given ID not found
+      tags:
+        - Employees
+
+    delete:
+      summary: Delete an employee by ID
+      operationId: deleteEmployee
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Employee ID
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Employee deleted successfully
+        '404':
+          description: Not Found - Employee with given ID not found
+      tags:
+        - Employees
+
+  /offers:
+    get:
+      summary: Retrieve all offers
+      operationId: getAllOffers
+      responses:
+        '200':
+          description: Offers retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OfferWithProviderAndCustomer'
+        '404':
+          description: Not Found - No offers found
+      tags:
+        - Offers
+
+    post:
+      summary: Create a new offer
+      operationId: createOffer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostOffer'
+      responses:
+        '201':
+          description: Offer created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OfferWithProviderAndCustomer'
+        '400':
+          description: Bad Request - Invalid input data
+      tags:
+        - Offers
+
+  /offers/{id}:
+    get:
+      summary: Retrieve offer information by ID
+      operationId: getOffer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Offer ID
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Offer information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OfferWithProviderAndCustomer'
+        '404':
+          description: Not Found - Offer with given ID not found
+      tags:
+        - Offers
+
+    put:
+      summary: Update offer information by ID
+      operationId: updateOffer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Offer ID
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateOffer'
+      responses:
+        '200':
+          description: Offer updated successfully
+        '404':
+          description: Not Found - Offer with given ID not found
+      tags:
+        - Offers
+
+    delete:
+      summary: Delete an offer by ID
+      operationId: deleteOffer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Offer ID
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Offer deleted successfully
+        '404':
+          description: Not Found - Offer with given ID not found
+      tags:
+        - Offers
+
+  /offers/{offerId}/employees:
+    post:
+      summary: Assign an employee to an offer
+      operationId: assignEmployeeToOffer
+      parameters:
+        - name: offerId
+          in: path
+          required: true
+          description: Offer ID
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignEmployeeToOffer'
+      responses:
+        '201':
+          description: Employee assigned to offer successfully
+        '404':
+          description: Not Found - Offer with given ID not found
+        '400':
+          description: Bad Request - Invalid input data
+      tags:
+        - Offers
+
+  /offer-deliveries:
+    get:
+      summary: Retrieve all offer deliveries
+      operationId: getAllOfferDeliveries
+      responses:
+        '200':
+          description: Offer deliveries retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OfferDelivery'
+        '404':
+          description: Not Found - No offer deliveries found
+      tags:
+        - Offer Deliveries
+
+    post:
+      summary: Create a new offer delivery
+      operationId: createOfferDelivery
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOfferDelivery'
+      responses:
+        '201':
+          description: Offer delivery created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OfferDelivery'
+        '400':
+          description: Bad Request - Invalid input data
+      tags:
+        - Offer Deliveries
+
+  /offer-deliveries/{id}:
+    get:
+      summary: Retrieve offer delivery information by ID
+      operationId: getOfferDelivery
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Offer Delivery ID
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Offer delivery information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OfferDelivery'
+        '404':
+          description: Not Found - Offer delivery with given ID not found
+      tags:
+        - Offer Deliveries
+
+    put:
+      summary: Update offer delivery information by ID
+      operationId: updateOfferDelivery
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Offer Delivery ID
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOfferDelivery'
+      responses:
+        '200':
+          description: Offer delivery updated successfully
+        '404':
+          description: Not Found - Offer delivery with given ID not found
+      tags:
+        - Offer Deliveries
+
+    delete:
+      summary: Delete an offer delivery by ID
+      operationId: deleteOfferDelivery
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Offer Delivery ID
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Offer delivery deleted successfully
+        '404':
+          description: Not Found - Offer delivery with given ID not found
+      tags:
+        - Offer Deliveries
+
+  /providers:
+    get:
+      summary: Retrieve all providers
+      operationId: getAllProviders
+      responses:
+        '200':
+          description: Providers retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Provider'
+        '404':
+          description: Not Found - No providers found
+      tags:
+        - Providers
+
+    post:
+      summary: Create a new provider
+      operationId: createProvider
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostProvider'
+      responses:
+        '201':
+          description: Provider created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Provider'
+        '400':
+          description: Bad Request - Invalid input data
+      tags:
+        - Providers
+
+  /providers/{id}:
+    get:
+      summary: Retrieve provider information by ID
+      operationId: getProvider
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Provider ID
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Provider information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Provider'
+        '404':
+          description: Not Found - Provider with given ID not found
+      tags:
+        - Providers
+
+    put:
+      summary: Update provider information by ID
+      operationId: updateProvider
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Provider ID
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Provider'
+      responses:
+        '200':
+          description: Provider updated successfully
+        '404':
+          description: Not Found - Provider with given ID not found
+      tags:
+        - Providers
+
+    delete:
+      summary: Delete a provider by ID
+      operationId: deleteProvider
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Provider ID
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Provider deleted successfully
+        '404':
+          description: Not Found - Provider with given ID not found
+      tags:
+        - Providers
+
+components:
+  schemas:
+    PostCustomer:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        contactNumber:
+          type: string
+      required:
+        - name
+        - email
+        - contactNumber
+
+    Customer:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        contactNumber:
+          type: string
+      required:
+        - id
+        - name
+        - email
+        - contactNumber
+
+    CustomerWithProvider:
+      allOf:
+        - $ref: '#/components/schemas/Customer'
+        - properties:
+            provider:
+              $ref: '#/components/schemas/Provider'
+
+    PostEmployee:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        dateOfBirth:
+          type: string
+          format: date
+        contactNumber:
+          type: string
+        providerId:
+          type: integer
+      required:
+        - firstName
+        - lastName
+        - email
+        - dateOfBirth
+        - contactNumber
+        - providerId
+        
+        
+
+    Employee:
+      type: object
+      properties:
+        id:
+          type: integer
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        dateOfBirth:
+          type: string
+          format: date
+        contactNumber:
+          type: string
+      required:
+        - id
+        - firstName
+        - lastName
+        - email
+        - dateOfBirth
+        - contactNumber
+
+    UpdateEmployee:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        dateOfBirth:
+          type: string
+          format: date
+        contactNumber:
+          type: string
+        providerId:
+          type: integer
+      required:
+        - firstName
+        - lastName
+        - email
+        - dateOfBirth
+        - contactNumber
+        - providerId
+
+    EmployeeWithProvider:
+      allOf:
+        - $ref: '#/components/schemas/Employee'
+        - properties:
+            provider:
+              $ref: '#/components/schemas/Provider'
+
+    PostOffer:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        cost:
+          type: integer
+        status:
+          type: string
+        providerId:
+          type: integer
+        customerId:
+          type: integer
+      required:
+        - title
+        - description
+        - cost
+        - status
+        - providerId
+        - customerId
+
+    Offer:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        cost:
+          type: integer
+        status:
+          type: string
+      required:
+        - id
+        - title
+        - description
+        - cost
+        - status
+
+    OfferWithProviderAndCustomer:
+      allOf:
+        - $ref: '#/components/schemas/Offer'
+        - properties:
+            provider:
+              $ref: '#/components/schemas/Provider'
+            customer:
+              $ref: '#/components/schemas/Customer'
+
+    UpdateOffer:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        cost:
+          type: integer
+        status:
+          type: string
+        providerId:
+          type: integer
+        customerId:
+          type: integer
+      required:
+        - title
+        - description
+        - cost
+        - status
+        - providerId
+        - customerId
+
+    CreateOfferDelivery:
+      type: object
+      properties:
+        deliveryDate:
+          type: string
+          format: date
+        accepted:
+          type: boolean
+        offerId:
+          type: integer
+      required:
+        - deliveryDate
+        - accepted
+        - offer
+
+    OfferDelivery:
+      type: object
+      properties:
+        id:
+          type: integer
+        deliveryDate:
+          type: string
+          format: date
+        accepted:
+          type: boolean
+        offer:
+          $ref: '#/components/schemas/OfferWithProviderAndCustomer'
+      required:
+        - id
+        - deliveryDate
+        - accepted
+        - offer
+
+    PostProvider:
+      type: object
+      properties:
+        name:
+          type: string
+        address:
+          type: string
+        email:
+          type: string
+        contactNumber:
+          type: string
+      required:
+        - name
+        - address
+        - email
+        - contactNumber
+
+    Provider:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        address:
+          type: string
+        email:
+          type: string
+        contactNumber:
+          type: string
+      required:
+        - id
+        - name
+        - address
+        - email
+        - contactNumber
+
+    AssignEmployeeToOffer:
+      type: object
+      properties:
+        employeeId:
+          type: integer
+      required:
+        - employeeId
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
