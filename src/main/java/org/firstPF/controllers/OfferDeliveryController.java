@@ -1,6 +1,5 @@
 package org.firstPF.controllers;
 
-import org.firstPF.entities.Offer;
 import org.firstPF.entities.OfferDelivery;
 import org.firstPF.services.OfferDeliveryService;
 import org.springframework.beans.factory.annotation.Autowired;
