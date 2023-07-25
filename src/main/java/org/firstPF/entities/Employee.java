@@ -96,4 +96,12 @@ public class Employee {
     public void setProvider(Provider provider) {
         this.provider = provider;
     }
+
+    public void addOffer(Offer offer) {
+        offers.add(offer);
+    }
+
+    public void removeOffer(Offer offer) {
+        offers.remove(offer);
+    }
 }

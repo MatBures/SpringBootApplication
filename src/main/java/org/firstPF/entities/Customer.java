@@ -18,6 +18,7 @@ public class Customer {
     @Column(name = "contact_number")
     private String contactNumber;
 
+
     public Long getId() {
         return id;
     }
