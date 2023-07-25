@@ -34,8 +34,6 @@ public class Offer {
     @ManyToMany(mappedBy = "offers")
     private Set<Employee> employees = new HashSet<>();
 
-    // Getters and Setters
-
     public Long getId() {
         return id;
     }
@@ -91,4 +89,12 @@ public class Offer {
     public void setCustomer(Customer customer) {
         this.customer = customer;
     }
+
+    public void addEmployee(Employee employee) {
+        employees.add(employee);
+    }
+    public void removeEmployee(Employee employee) {
+        employees.remove(employee);
+    }
+
 }

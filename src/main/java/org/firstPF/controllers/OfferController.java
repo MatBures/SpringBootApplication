@@ -1,6 +1,9 @@
 package org.firstPF.controllers;
 
+import org.firstPF.entities.Employee;
 import org.firstPF.entities.Offer;
+import org.firstPF.repositories.EmployeeRepository;
+import org.firstPF.services.EmployeeService;
 import org.firstPF.services.OfferService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,10 +17,17 @@ import java.util.Optional;
 @RequestMapping("/offers")
 public class OfferController {
     private final OfferService offerService;
+    private final EmployeeService employeeService;
+
+    private final EmployeeRepository employeeRepository;
 
     @Autowired
-    public OfferController(OfferService offerService) {
+    public OfferController(OfferService offerService,
+                           EmployeeService employeeService,
+                           EmployeeRepository employeeRepository) {
         this.offerService = offerService;
+        this.employeeService = employeeService;
+        this.employeeRepository = employeeRepository;
     }
 
     @PostMapping
@@ -33,6 +43,32 @@ public class OfferController {
 
         Offer createdOffer = offerService.createOffer(offer);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdOffer);
+    }
+
+    @PostMapping("/{offerId}/employees")
+    public ResponseEntity<String> assignEmployeeToOffer(@PathVariable Long offerId, @RequestBody Long employeeId) {
+        Optional<Offer> optionalOffer = offerService.getOfferById(offerId);
+        Optional<Employee> optionalEmployee = employeeRepository.findById(employeeId);
+
+        if (optionalOffer.isEmpty()) {
+            return ResponseEntity.badRequest().body("Offer doesnt exist.");
+        }
+        if(optionalEmployee.isEmpty()) {
+            return ResponseEntity.badRequest().body("Employee doesnt exist.");
+        }
+
+        Offer offer = optionalOffer.get();
+        Employee employee = optionalEmployee.get();
+
+        // Add the employee to the offer's employees set
+        offer.addEmployee(employee);
+        offerService.createOffer(offer);
+
+        // Add the offer to the employee's offers set (optional, but good practice for bidirectional relationships)
+        employee.addOffer(offer);
+        employeeRepository.save(employee);
+
+        return ResponseEntity.ok("Employee assigned to offer successfully");
     }
 
     @GetMapping
