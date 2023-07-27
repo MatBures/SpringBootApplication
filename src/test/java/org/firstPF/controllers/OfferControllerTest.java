@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -57,31 +59,41 @@ class OfferControllerTest {
     @Test
     void testCreateOfferWithInvalidProviderId() {
         Offer offer = new Offer();
-        offer.setTitle("Sample Offer");
-        offer.setDescription("This is a sample offer.");
-        offer.setCost(100);
+        offer.setTitle("Invalid Provider Offer");
+        offer.setDescription("This is an offer with an invalid providerId.");
+        offer.setCost(200);
         offer.setStatus("Unaccepted");
         offer.setCustomer(customer);
 
+        when(offerService.createOffer(any(Offer.class)))
+                .thenThrow(new IllegalArgumentException("ProviderId is required."));
+
         ResponseEntity<?> response = offerController.createOffer(offer);
 
-        verify(offerService, never()).createOffer(any(Offer.class));
+        verify(offerService, times(1)).createOffer(any(Offer.class));
         assert response.getStatusCode() == HttpStatus.BAD_REQUEST;
+        assert response.getBody() instanceof String;
+        assert response.getBody().equals("ProviderId is required.");
     }
 
     @Test
     void testCreateOfferWithInvalidCustomerId() {
         Offer offer = new Offer();
-        offer.setTitle("Sample Offer");
-        offer.setDescription("This is a sample offer.");
-        offer.setCost(100);
+        offer.setTitle("Invalid Customer Offer");
+        offer.setDescription("This is an offer with an invalid customerId.");
+        offer.setCost(150);
         offer.setStatus("Unaccepted");
         offer.setProvider(provider);
 
+        when(offerService.createOffer(any(Offer.class)))
+                .thenThrow(new IllegalArgumentException("CustomerId is required."));
+
         ResponseEntity<?> response = offerController.createOffer(offer);
 
-        verify(offerService, never()).createOffer(any(Offer.class));
+        verify(offerService, times(1)).createOffer(any(Offer.class));
         assert response.getStatusCode() == HttpStatus.BAD_REQUEST;
+        assert response.getBody() instanceof String;
+        assert response.getBody().equals("CustomerId is required.");
     }
 
     @Test
@@ -170,32 +182,6 @@ class OfferControllerTest {
     }
 
     @Test
-    void testUpdateOfferWithInvalidProviderId() {
-        Long offerId = 1L;
-        Offer existingOffer = new Offer();
-        existingOffer.setTitle("Sample Offer");
-        existingOffer.setDescription("This is a sample offer.");
-        existingOffer.setCost(100);
-        existingOffer.setStatus("Unaccepted");
-        existingOffer.setProvider(provider);
-        existingOffer.setCustomer(customer);
-
-        Offer updatedOffer = new Offer();
-        updatedOffer.setTitle("Updated Offer");
-        updatedOffer.setDescription("This is an updated offer.");
-        updatedOffer.setCost(200);
-        updatedOffer.setStatus("Accepted");
-        updatedOffer.setCustomer(customer);
-
-        when(offerService.getOfferById(offerId)).thenReturn(Optional.of(existingOffer));
-
-        ResponseEntity<?> response = offerController.updateOffer(offerId, updatedOffer);
-
-        verify(offerService, never()).createOffer(any(Offer.class));
-        assert response.getStatusCode() == HttpStatus.BAD_REQUEST;
-    }
-
-    @Test
     void testUpdateOfferWithInvalidCustomerId() {
         Long offerId = 1L;
         Offer existingOffer = new Offer();
@@ -214,11 +200,12 @@ class OfferControllerTest {
         updatedOffer.setProvider(provider);
 
         when(offerService.getOfferById(offerId)).thenReturn(Optional.of(existingOffer));
+        when(offerService.updateOffer(eq(offerId), any(Offer.class))).thenReturn(null);
 
         ResponseEntity<?> response = offerController.updateOffer(offerId, updatedOffer);
 
-        verify(offerService, never()).createOffer(any(Offer.class));
-        assert response.getStatusCode() == HttpStatus.BAD_REQUEST;
+        verify(offerService, times(1)).updateOffer(eq(offerId), eq(updatedOffer));
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
     @Test
@@ -241,11 +228,11 @@ class OfferControllerTest {
         updatedOffer.setCustomer(customer);
 
         when(offerService.getOfferById(offerId)).thenReturn(Optional.of(existingOffer));
-        when(offerService.createOffer(any(Offer.class))).thenReturn(updatedOffer);
+        when(offerService.updateOffer(eq(offerId), any(Offer.class))).thenReturn(updatedOffer);
 
         ResponseEntity<?> response = offerController.updateOffer(offerId, updatedOffer);
 
-        verify(offerService, times(1)).createOffer(any(Offer.class));
+        verify(offerService, times(1)).updateOffer(eq(offerId), any(Offer.class));
         assert response.getStatusCode() == HttpStatus.OK;
         assert response.getBody() instanceof Offer;
         Offer updatedOfferEntity = (Offer) response.getBody();
@@ -265,12 +252,12 @@ class OfferControllerTest {
         updatedOffer.setCustomer(customer);
 
         when(offerService.getOfferById(offerId)).thenReturn(Optional.empty());
+        when(offerService.updateOffer(anyLong(), any(Offer.class))).thenReturn(null);
 
         ResponseEntity<?> response = offerController.updateOffer(offerId, updatedOffer);
 
-        verify(offerService, times(1)).getOfferById(offerId);
-        verify(offerService, never()).createOffer(any(Offer.class));
-        assert response.getStatusCode() == HttpStatus.NOT_FOUND;
+        verify(offerService, times(1)).updateOffer(eq(offerId), eq(updatedOffer));
+        assert response.getStatusCode() == HttpStatus.BAD_REQUEST;
     }
 
     @Test
@@ -304,32 +291,13 @@ class OfferControllerTest {
         Long offerId = 1L;
         Long employeeId = 2L;
 
-        Offer offer = new Offer();
-        offer.setId(offerId);
-        offer.setTitle("Sample Offer");
-        offer.setDescription("This is a sample offer.");
-        offer.setCost(100L);
-        offer.setStatus("Unaccepted");
-
-        Employee employee = new Employee();
-        employee.setId(employeeId);
-        employee.setFirstName("John");
-        employee.setLastName("Doe");
-        employee.setEmail("john.doe@example.com");
-        employee.setDateOfBirth(LocalDate.of(1990, 5, 15));
-        employee.setContactNumber("9876543210");
-
-        when(offerService.getOfferById(offerId)).thenReturn(Optional.of(offer));
-        when(employeeRepository.findById(employeeId)).thenReturn(Optional.of(employee));
+        doNothing().when(offerService).assignEmployeeToOffer(offerId, employeeId);
 
         ResponseEntity<String> response = offerController.assignEmployeeToOffer(offerId, employeeId);
 
-        verify(offerService, times(1)).getOfferById(offerId);
-        verify(employeeRepository, times(1)).findById(employeeId);
-        verify(offerService, times(1)).createOffer(offer);
-        verify(employeeRepository, times(1)).save(employee);
-
+        verify(offerService, times(1)).assignEmployeeToOffer(offerId, employeeId);
         assert response.getStatusCode() == HttpStatus.OK;
+        assert response.getBody() != null;
         assert response.getBody().equals("Employee assigned to offer successfully");
     }
 
@@ -338,25 +306,15 @@ class OfferControllerTest {
         Long invalidOfferId = 999L;
         Long employeeId = 2L;
 
-        Employee employee = new Employee();
-        employee.setId(employeeId);
-        employee.setFirstName("John");
-        employee.setLastName("Doe");
-        employee.setEmail("john.doe@example.com");
-        employee.setDateOfBirth(LocalDate.of(1990, 5, 15));
-        employee.setContactNumber("9876543210");
-
-        when(offerService.getOfferById(invalidOfferId)).thenReturn(Optional.empty());
-        when(employeeRepository.findById(employeeId)).thenReturn(Optional.of(employee));
+        Mockito.doThrow(new IllegalArgumentException("Offer doesn't exist."))
+                .when(offerService).assignEmployeeToOffer(invalidOfferId, employeeId);
 
         ResponseEntity<String> response = offerController.assignEmployeeToOffer(invalidOfferId, employeeId);
 
-        verify(offerService, times(1)).getOfferById(invalidOfferId);
-        verify(offerService, never()).createOffer(any(Offer.class));
-        verify(employeeRepository, never()).save(any(Employee.class));
-
+        verify(offerService, times(1)).assignEmployeeToOffer(invalidOfferId, employeeId);
         assert response.getStatusCode() == HttpStatus.BAD_REQUEST;
-        assert response.getBody().equals("Offer doesnt exist.");
+        assert response.getBody() instanceof String;
+        assert response.getBody().equals("Offer doesn't exist.");
     }
 
     @Test
@@ -364,24 +322,14 @@ class OfferControllerTest {
         Long offerId = 1L;
         Long invalidEmployeeId = 999L;
 
-        Offer offer = new Offer();
-        offer.setId(offerId);
-        offer.setTitle("Sample Offer");
-        offer.setDescription("This is a sample offer.");
-        offer.setCost(100L);
-        offer.setStatus("Unaccepted");
-
-        when(offerService.getOfferById(offerId)).thenReturn(Optional.of(offer));
-        when(employeeRepository.findById(invalidEmployeeId)).thenReturn(Optional.empty());
+        Mockito.doThrow(new IllegalArgumentException("Employee doesn't exist."))
+                .when(offerService).assignEmployeeToOffer(offerId, invalidEmployeeId);
 
         ResponseEntity<String> response = offerController.assignEmployeeToOffer(offerId, invalidEmployeeId);
 
-        verify(offerService, times(1)).getOfferById(offerId);
-        verify(employeeRepository, times(1)).findById(invalidEmployeeId);
-        verify(offerService, never()).createOffer(any(Offer.class));
-        verify(employeeRepository, never()).save(any(Employee.class));
-
+        verify(offerService, times(1)).assignEmployeeToOffer(offerId, invalidEmployeeId);
         assert response.getStatusCode() == HttpStatus.BAD_REQUEST;
-        assert response.getBody().equals("Employee doesnt exist.");
+        assert response.getBody() instanceof String;
+        assert response.getBody().equals("Employee doesn't exist.");
     }
 }

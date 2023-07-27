@@ -29,6 +29,18 @@ public class ProviderService {
         return providerRepository.findById(id);
     }
 
+    public Provider updateProvider(Long id, Provider updatedProvider) {
+        Optional<Provider> providerOptional = providerRepository.findById(id);
+        if (providerOptional.isPresent()) {
+            Provider provider = providerOptional.get();
+            provider.setName(updatedProvider.getName());
+            provider.setAddress(updatedProvider.getAddress());
+            provider.setEmail(updatedProvider.getEmail());
+            provider.setContactNumber(updatedProvider.getContactNumber());
+            return providerRepository.save(provider);
+        }
+        return null;
+    }
     public void deleteProvider(Long id) {
         providerRepository.deleteById(id);
     }

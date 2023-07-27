@@ -26,24 +26,18 @@ public class OfferDeliveryController {
 
     @PostMapping
     public ResponseEntity<OfferDelivery> createOfferDelivery(@RequestBody OfferDelivery offerDelivery) {
-        Long offerId = offerDelivery.getOffer().getId();
-        if (offerId == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        try {
+            OfferDelivery createdOfferDelivery = offerDeliveryService.createOfferDelivery(offerDelivery);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdOfferDelivery);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(null);
         }
-
-        Optional<Offer> existingOffer = offerService.getOfferById(offerId);
-        if (existingOffer.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        OfferDelivery createdOfferDelivery = offerDeliveryService.createOfferDelivery(offerDelivery);
-        return new ResponseEntity<>(createdOfferDelivery, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<List<OfferDelivery>> getAllOffers() {
+    public ResponseEntity<List<OfferDelivery>> getAllOfferDeliveries() {
         List<OfferDelivery> allOfferDeliveries = offerDeliveryService.getAllOfferDeliveries();
-        return new ResponseEntity<>(allOfferDeliveries, HttpStatus.OK);
+        return ResponseEntity.ok(allOfferDeliveries);
     }
 
     @GetMapping("/{id}")
@@ -52,32 +46,15 @@ public class OfferDeliveryController {
         if (offerDelivery == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(offerDelivery, HttpStatus.OK);
+        return ResponseEntity.ok(offerDelivery);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<OfferDelivery> updateOfferDelivery(@PathVariable Long id, @RequestBody OfferDelivery updatedOfferDelivery) {
-        Long offerId = updatedOfferDelivery.getOffer().getId();
-        if (offerId == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        Optional<Offer> existingOffer = offerService.getOfferById(offerId);
-        if (existingOffer.isEmpty()) {
+        OfferDelivery updatedOfferDeliveryEntity = offerDeliveryService.updateOfferDelivery(id, updatedOfferDelivery);
+        if (updatedOfferDeliveryEntity == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
-        OfferDelivery existingOfferDelivery = offerDeliveryService.getOfferDeliveryById(id).orElse(null);
-        if (existingOfferDelivery == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        // Update the offerDelivery properties with the updatedOfferDelivery
-        existingOfferDelivery.setDeliveryDate(updatedOfferDelivery.getDeliveryDate());
-        existingOfferDelivery.setAccepted(updatedOfferDelivery.isAccepted());
-        existingOfferDelivery.setOffer(existingOffer.get());
-
-        OfferDelivery updatedOfferDeliveryEntity = offerDeliveryService.createOfferDelivery(existingOfferDelivery);
         return new ResponseEntity<>(updatedOfferDeliveryEntity, HttpStatus.OK);
     }
 

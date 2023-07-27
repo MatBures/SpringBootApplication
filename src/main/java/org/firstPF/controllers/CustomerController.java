@@ -23,44 +23,39 @@ public class CustomerController {
     @PostMapping
     public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
         Customer createdCustomer = customerService.createCustomer(customer);
-        return new ResponseEntity<>(createdCustomer, HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdCustomer);
     }
 
     @GetMapping
     public ResponseEntity<List<Customer>> getAllCustomers() {
         List<Customer> customers = customerService.getAllCustomers();
-        return new ResponseEntity<>(customers, HttpStatus.OK);
+        return ResponseEntity.ok(customers);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Customer> getCustomerById(@PathVariable Long id) {
-        Customer customer = customerService.getCustomerById(id).orElse(null);
-        if (customer == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        Optional<Customer> customer = customerService.getCustomerById(id);
+        if (customer.isPresent()) {
+            return ResponseEntity.ok(customer.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-        return new ResponseEntity<>(customer, HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Customer> updateCustomer(@PathVariable Long id, @RequestBody Customer updatedCustomer) {
-        Customer customer = customerService.getCustomerById(id).orElse(null);
-        if (customer == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        Customer updatedCustomerEntity = customerService.updateCustomer(id, updatedCustomer);
+        if (updatedCustomerEntity == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-        // Update the customer properties with the updatedCustomer
-        customer.setName(updatedCustomer.getName());
-        customer.setEmail(updatedCustomer.getEmail());
-        customer.setContactNumber(updatedCustomer.getContactNumber());
-
-        Customer updatedCustomerEntity = customerService.createCustomer(customer);
-        return new ResponseEntity<>(updatedCustomerEntity, HttpStatus.OK);
+        return ResponseEntity.ok(updatedCustomerEntity);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCustomer(@PathVariable Long id) {
         Optional<Customer> customer = customerService.getCustomerById(id);
         if (customer.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
         customerService.deleteCustomer(id);

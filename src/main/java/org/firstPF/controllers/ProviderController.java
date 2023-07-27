@@ -1,6 +1,5 @@
 package org.firstPF.controllers;
 
-
 import org.firstPF.entities.Provider;
 import org.firstPF.services.ProviderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,13 +23,13 @@ public class ProviderController {
     @PostMapping
     public ResponseEntity<Provider> createProvider(@RequestBody Provider provider) {
         Provider createdProvider = providerService.createProvider(provider);
-        return new ResponseEntity<>(createdProvider, HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdProvider);
     }
 
     @GetMapping
     public ResponseEntity<List<Provider>> getAllProviders() {
         List<Provider> providers = providerService.getAllProviders();
-        return new ResponseEntity<>(providers, HttpStatus.OK);
+        return ResponseEntity.ok(providers);
     }
 
     @GetMapping("/{id}")
@@ -39,22 +38,15 @@ public class ProviderController {
         if (provider == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(provider, HttpStatus.OK);
+        return ResponseEntity.ok(provider);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Provider> updateProvider(@PathVariable Long id, @RequestBody Provider updatedProvider) {
-        Provider provider = providerService.getProviderById(id).orElse(null);
-        if (provider == null) {
+        Provider updatedProviderEntity = providerService.updateProvider(id, updatedProvider);
+        if (updatedProviderEntity == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        // Update the provider properties with the updatedProvider
-        provider.setName(updatedProvider.getName());
-        provider.setAddress(updatedProvider.getAddress());
-        provider.setEmail(updatedProvider.getEmail());
-        provider.setContactNumber(updatedProvider.getContactNumber());
-
-        Provider updatedProviderEntity = providerService.createProvider(provider);
         return new ResponseEntity<>(updatedProviderEntity, HttpStatus.OK);
     }
 

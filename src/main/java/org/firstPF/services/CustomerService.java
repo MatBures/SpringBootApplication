@@ -29,6 +29,20 @@ public class CustomerService {
         return customerRepository.findById(id);
     }
 
+    public Customer updateCustomer(Long id, Customer updatedCustomer) {
+        Optional<Customer> optionalCustomer = customerRepository.findById(id);
+        if (optionalCustomer.isEmpty()) {
+            return null;
+        }
+
+        Customer customer = optionalCustomer.get();
+        customer.setName(updatedCustomer.getName());
+        customer.setEmail(updatedCustomer.getEmail());
+        customer.setContactNumber(updatedCustomer.getContactNumber());
+
+        return customerRepository.save(customer);
+    }
+
     public void deleteCustomer(Long id) {
         customerRepository.deleteById(id);
     }

@@ -21,7 +21,6 @@ class ApplicationTests {
 			.withUsername("postgres")
 			.withPassword("admin");
 
-
 	@DynamicPropertySource
 	static void configurePostgres(DynamicPropertyRegistry registry) {
 		postgres.start();
