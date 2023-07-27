@@ -19,6 +19,10 @@ public class EmployeeService {
     }
 
     public Employee createEmployee(Employee employee) {
+        if (employee.getProvider() == null || employee.getProvider().getId() == null) {
+            throw new IllegalArgumentException("ProviderId is required.");
+        }
+
         return employeeRepository.save(employee);
     }
 
@@ -32,5 +36,27 @@ public class EmployeeService {
 
     public void deleteEmployee(Long id) {
         employeeRepository.deleteById(id);
+    }
+
+    public Employee updateEmployee(Long id, Employee updatedEmployee) {
+        Optional<Employee> optionalEmployee = employeeRepository.findById(id);
+        if (optionalEmployee.isEmpty()) {
+            return null;
+        }
+
+        Employee employee = optionalEmployee.get();
+
+        if (updatedEmployee.getProvider() == null || updatedEmployee.getProvider().getId() == null) {
+            return null;
+        }
+
+        employee.setFirstName(updatedEmployee.getFirstName());
+        employee.setLastName(updatedEmployee.getLastName());
+        employee.setEmail(updatedEmployee.getEmail());
+        employee.setDateOfBirth(updatedEmployee.getDateOfBirth());
+        employee.setContactNumber(updatedEmployee.getContactNumber());
+        employee.setProvider(updatedEmployee.getProvider());
+
+        return employeeRepository.save(employee);
     }
 }

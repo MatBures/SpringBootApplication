@@ -22,11 +22,6 @@ public class EmployeeController {
 
     @PostMapping
     public ResponseEntity<?> createEmployee(@RequestBody Employee employee) {
-        // Check if providerId is provided
-        if (employee.getProvider() == null || employee.getProvider().getId() == null) {
-            return ResponseEntity.badRequest().body("ProviderId is required.");
-        }
-
         Employee createdEmployee = employeeService.createEmployee(employee);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdEmployee);
     }
@@ -34,7 +29,7 @@ public class EmployeeController {
     @GetMapping
     public ResponseEntity<List<Employee>> getAllEmployees() {
         List<Employee> employees = employeeService.getAllEmployees();
-        return new ResponseEntity<>(employees, HttpStatus.OK);
+        return ResponseEntity.ok(employees);
     }
 
     @GetMapping("/{id}")
@@ -43,31 +38,16 @@ public class EmployeeController {
         if (employee == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(employee, HttpStatus.OK);
+        return ResponseEntity.ok(employee);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateEmployee(@PathVariable Long id, @RequestBody Employee updatedEmployee) {
-        Employee employee = employeeService.getEmployeeById(id).orElse(null);
-        if (employee == null) {
+        Employee updatedEmployeeEntity = employeeService.updateEmployee(id, updatedEmployee);
+        if (updatedEmployeeEntity == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
-        // Check if providerId and customerId are provided in the updatedOffer
-        if (updatedEmployee.getProvider() == null || updatedEmployee.getProvider().getId() == null) {
-            return ResponseEntity.badRequest().body("ProviderId is required for updating an employee.");
-        }
-
-        // Update the employee properties with the updatedEmployee
-        employee.setFirstName(updatedEmployee.getFirstName());
-        employee.setLastName(updatedEmployee.getLastName());
-        employee.setEmail(updatedEmployee.getEmail());
-        employee.setDateOfBirth(updatedEmployee.getDateOfBirth());
-        employee.setContactNumber(updatedEmployee.getContactNumber());
-        employee.setProvider(updatedEmployee.getProvider());
-
-        Employee updatedEmployeeEntity = employeeService.createEmployee(employee);
-        return new ResponseEntity<>(updatedEmployeeEntity, HttpStatus.OK);
+        return ResponseEntity.ok(updatedEmployeeEntity);
     }
 
     @DeleteMapping("/{id}")
@@ -80,5 +60,4 @@ public class EmployeeController {
         employeeService.deleteEmployee(id);
         return ResponseEntity.noContent().build();
     }
-
 }

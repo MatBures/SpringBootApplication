@@ -4,9 +4,7 @@ import org.firstPF.entities.Provider;
 import org.firstPF.services.ProviderService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -95,39 +93,47 @@ class ProviderControllerTest {
     @Test
     void testUpdateProvider() {
         Long providerId = 1L;
-        Provider updatedProvider = new Provider();
-        updatedProvider.setId(providerId);
-        updatedProvider.setName("Updated Provider");
-        updatedProvider.setAddress("456 New Street");
+        Provider existingProvider = new Provider();
+        existingProvider.setId(providerId);
+        existingProvider.setName("Existing Provider");
+        existingProvider.setAddress("Old Address");
+        existingProvider.setEmail("existing@example.com");
+        existingProvider.setContactNumber("123456789");
 
-        when(providerService.getProviderById(providerId)).thenReturn(Optional.of(provider));
-        when(providerService.createProvider(any(Provider.class))).thenReturn(updatedProvider);
+        Provider updatedProvider = new Provider();
+        updatedProvider.setName("Updated Provider");
+        updatedProvider.setAddress("New Address");
+        updatedProvider.setEmail("updated@example.com");
+        updatedProvider.setContactNumber("987654321");
+
+        Mockito.when(providerService.updateProvider(ArgumentMatchers.eq(providerId), ArgumentMatchers.any(Provider.class)))
+                .thenReturn(updatedProvider);
 
         ResponseEntity<Provider> response = providerController.updateProvider(providerId, updatedProvider);
 
-        verify(providerService, times(1)).getProviderById(providerId);
-        verify(providerService, times(1)).createProvider(any(Provider.class));
+        Mockito.verify(providerService, Mockito.times(1)).updateProvider(ArgumentMatchers.eq(providerId), ArgumentMatchers.any(Provider.class));
         assert response.getStatusCode() == HttpStatus.OK;
         assert response.getBody() != null;
-        assert response.getBody().getId().equals(providerId);
         assert response.getBody().getName().equals(updatedProvider.getName());
-        assert response.getBody().getAddress().equals(updatedProvider.getAddress());
     }
 
     @Test
     void testUpdateProviderNotFound() {
-        Long providerId = 999L;
+        Long invalidProviderId = 999L;
         Provider updatedProvider = new Provider();
         updatedProvider.setName("Updated Provider");
-        updatedProvider.setAddress("456 New Street");
+        updatedProvider.setAddress("New Address");
+        updatedProvider.setEmail("updated@example.com");
+        updatedProvider.setContactNumber("987654321");
 
-        when(providerService.getProviderById(providerId)).thenReturn(Optional.empty());
+        Mockito.when(providerService.updateProvider(ArgumentMatchers.eq(invalidProviderId), ArgumentMatchers.any(Provider.class)))
+                .thenReturn(null);
 
-        ResponseEntity<Provider> response = providerController.updateProvider(providerId, updatedProvider);
+        ResponseEntity<Provider> response = providerController.updateProvider(invalidProviderId, updatedProvider);
 
-        verify(providerService, times(1)).getProviderById(providerId);
-        verify(providerService, never()).createProvider(any(Provider.class));
+        Mockito.verify(providerService, Mockito.times(1)).updateProvider(ArgumentMatchers.eq(invalidProviderId), ArgumentMatchers.any(Provider.class));
         assert response.getStatusCode() == HttpStatus.NOT_FOUND;
+        assert response.getBody() == null;
     }
 
     @Test

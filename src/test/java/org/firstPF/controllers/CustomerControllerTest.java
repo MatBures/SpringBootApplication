@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -105,46 +106,43 @@ class CustomerControllerTest {
     }
 
     @Test
-    void testUpdateCustomer() {
+    void testUpdateCustomerSuccess() {
         Long customerId = 1L;
         Customer existingCustomer = new Customer();
-        existingCustomer.setName("John Doe");
-        existingCustomer.setEmail("john.doe@example.com");
+        existingCustomer.setName("John");
+        existingCustomer.setEmail("john@example.com");
         existingCustomer.setContactNumber("1234567890");
 
         Customer updatedCustomer = new Customer();
-        updatedCustomer.setName("Jane Smith");
-        updatedCustomer.setEmail("jane.smith@example.com");
-        updatedCustomer.setContactNumber("9876543210");
+        updatedCustomer.setName("John Doe");
+        updatedCustomer.setEmail("johndoe@example.com");
+        updatedCustomer.setContactNumber("5555555555");
 
         when(customerService.getCustomerById(customerId)).thenReturn(Optional.of(existingCustomer));
-        when(customerService.createCustomer(any(Customer.class))).thenReturn(updatedCustomer);
+        when(customerService.updateCustomer(customerId, updatedCustomer)).thenReturn(updatedCustomer);
 
         ResponseEntity<Customer> response = customerController.updateCustomer(customerId, updatedCustomer);
 
-        verify(customerService, times(1)).getCustomerById(customerId);
-        verify(customerService, times(1)).createCustomer(any(Customer.class));
-        assert response.getStatusCode() == HttpStatus.OK;
-        assert response.getBody() != null;
-        assert response.getBody().getName().equals(updatedCustomer.getName());
-
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(updatedCustomer.getName(), response.getBody().getName());
+        assertEquals(updatedCustomer.getEmail(), response.getBody().getEmail());
+        assertEquals(updatedCustomer.getContactNumber(), response.getBody().getContactNumber());
     }
+
 
     @Test
     void testUpdateCustomerNotFound() {
-        Long customerId = 999L;
+        Long customerId = 1L;
         Customer updatedCustomer = new Customer();
-        updatedCustomer.setName("Jane Smith");
-        updatedCustomer.setEmail("jane.smith@example.com");
-        updatedCustomer.setContactNumber("9876543210");
+        updatedCustomer.setName("John Doe");
+        updatedCustomer.setEmail("johndoe@example.com");
+        updatedCustomer.setContactNumber("5555555555");
 
         when(customerService.getCustomerById(customerId)).thenReturn(Optional.empty());
 
         ResponseEntity<Customer> response = customerController.updateCustomer(customerId, updatedCustomer);
 
-        verify(customerService, times(1)).getCustomerById(customerId);
-        verify(customerService, never()).createCustomer(any(Customer.class));
-        assert response.getStatusCode() == HttpStatus.NOT_FOUND;
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
     @Test

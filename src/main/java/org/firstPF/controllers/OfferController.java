@@ -32,49 +32,28 @@ public class OfferController {
 
     @PostMapping
     public ResponseEntity<?> createOffer(@RequestBody Offer offer) {
-        // Check if providerId and customerId are provided
-        if (offer.getProvider() == null || offer.getProvider().getId() == null) {
-            return ResponseEntity.badRequest().body("ProviderId is required.");
+        try {
+            Offer createdOffer = offerService.createOffer(offer);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdOffer);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-
-        if (offer.getCustomer() == null || offer.getCustomer().getId() == null) {
-            return ResponseEntity.badRequest().body("CustomerId is required.");
-        }
-
-        Offer createdOffer = offerService.createOffer(offer);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdOffer);
     }
 
     @PostMapping("/{offerId}/employees")
     public ResponseEntity<String> assignEmployeeToOffer(@PathVariable Long offerId, @RequestBody Long employeeId) {
-        Optional<Offer> optionalOffer = offerService.getOfferById(offerId);
-        Optional<Employee> optionalEmployee = employeeRepository.findById(employeeId);
-
-        if (optionalOffer.isEmpty()) {
-            return ResponseEntity.badRequest().body("Offer doesnt exist.");
+        try {
+            offerService.assignEmployeeToOffer(offerId, employeeId);
+            return ResponseEntity.ok("Employee assigned to offer successfully");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-        if(optionalEmployee.isEmpty()) {
-            return ResponseEntity.badRequest().body("Employee doesnt exist.");
-        }
-
-        Offer offer = optionalOffer.get();
-        Employee employee = optionalEmployee.get();
-
-        // Add the employee to the offer's employees set
-        offer.addEmployee(employee);
-        offerService.createOffer(offer);
-
-        // Add the offer to the employee's offers set (optional, but good practice for bidirectional relationships)
-        employee.addOffer(offer);
-        employeeRepository.save(employee);
-
-        return ResponseEntity.ok("Employee assigned to offer successfully");
     }
 
     @GetMapping
     public ResponseEntity<List<Offer>> getAllOffers() {
         List<Offer> allOffers = offerService.getAllOffers();
-        return new ResponseEntity<>(allOffers, HttpStatus.OK);
+        return ResponseEntity.ok(allOffers);
     }
 
     @GetMapping("/{id}")
@@ -83,34 +62,15 @@ public class OfferController {
         if (offer == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(offer, HttpStatus.OK);
+        return ResponseEntity.ok(offer);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateOffer(@PathVariable Long id, @RequestBody Offer updatedOffer) {
-        Offer offer = offerService.getOfferById(id).orElse(null);
-        if (offer == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        Offer updatedOfferEntity = offerService.updateOffer(id, updatedOffer);
+        if (updatedOfferEntity == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-
-        // Check if providerId and customerId are provided in the updatedOffer
-        if (updatedOffer.getProvider() == null || updatedOffer.getProvider().getId() == null) {
-            return ResponseEntity.badRequest().body("ProviderId is required for updating an offer.");
-        }
-
-        if (updatedOffer.getCustomer() == null || updatedOffer.getCustomer().getId() == null) {
-            return ResponseEntity.badRequest().body("CustomerId is required for updating an offer.");
-        }
-
-        // Update the offer properties with the updatedOffer
-        offer.setTitle(updatedOffer.getTitle());
-        offer.setDescription(updatedOffer.getDescription());
-        offer.setCost(updatedOffer.getCost());
-        offer.setStatus(updatedOffer.getStatus());
-        offer.setProvider(updatedOffer.getProvider());
-        offer.setCustomer(updatedOffer.getCustomer());
-
-        Offer updatedOfferEntity = offerService.createOffer(offer);
         return ResponseEntity.ok(updatedOfferEntity);
     }
 
@@ -120,7 +80,6 @@ public class OfferController {
         if (offer.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-
         offerService.deleteOffer(id);
         return ResponseEntity.noContent().build();
     }

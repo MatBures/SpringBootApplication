@@ -5,6 +5,7 @@ import org.firstPF.entities.Provider;
 import org.firstPF.services.EmployeeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -30,21 +32,6 @@ class EmployeeControllerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-    }
-
-    @Test
-    void testCreateEmployeeWithInvalidProviderId() {
-        Employee employee = new Employee();
-        employee.setFirstName("John");
-        employee.setLastName("Doe");
-        employee.setEmail("john.doe@example.com");
-        employee.setDateOfBirth(LocalDate.of(1990, 5, 15));
-        employee.setContactNumber("1234567890");
-
-        ResponseEntity<?> response = employeeController.createEmployee(employee);
-
-        verify(employeeService, never()).createEmployee(any(Employee.class));
-        assert response.getStatusCode() == HttpStatus.BAD_REQUEST;
     }
 
     @Test
@@ -137,84 +124,76 @@ class EmployeeControllerTest {
     @Test
     void testUpdateEmployeeWithInvalidProviderId() {
         Long employeeId = 1L;
-        Employee existingEmployee = new Employee();
-        existingEmployee.setFirstName("John");
-        existingEmployee.setLastName("Doe");
-        existingEmployee.setEmail("john.doe@example.com");
-        existingEmployee.setDateOfBirth(LocalDate.of(1990, 5, 15));
-        existingEmployee.setContactNumber("1234567890");
-
         Employee updatedEmployee = new Employee();
-        updatedEmployee.setFirstName("Jane");
-        updatedEmployee.setLastName("Smith");
-        updatedEmployee.setEmail("jane.smith@example.com");
-        updatedEmployee.setDateOfBirth(LocalDate.of(1995, 7, 25));
+        updatedEmployee.setFirstName("Updated John");
+        updatedEmployee.setLastName("Updated Doe");
+        updatedEmployee.setEmail("updated.john.doe@example.com");
+        updatedEmployee.setDateOfBirth(LocalDate.of(1992, 3, 20));
         updatedEmployee.setContactNumber("9876543210");
 
-        when(employeeService.getEmployeeById(employeeId)).thenReturn(Optional.of(existingEmployee));
+        when(employeeService.getEmployeeById(employeeId)).thenReturn(null);
+
+        when(employeeService.updateEmployee(anyLong(), any(Employee.class))).thenReturn(null);
 
         ResponseEntity<?> response = employeeController.updateEmployee(employeeId, updatedEmployee);
 
-        verify(employeeService, never()).createEmployee(any(Employee.class));
-        assert response.getStatusCode() == HttpStatus.BAD_REQUEST;
+        verify(employeeService, times(1)).updateEmployee(eq(employeeId), eq(updatedEmployee));
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
     @Test
     void testUpdateEmployeeWithValidProviderId() {
         Long employeeId = 1L;
+        Employee updatedEmployee = new Employee();
+        updatedEmployee.setFirstName("Updated John");
+        updatedEmployee.setLastName("Updated Doe");
+        updatedEmployee.setEmail("updated.john.doe@example.com");
+        updatedEmployee.setDateOfBirth(LocalDate.of(1992, 3, 20));
+        updatedEmployee.setContactNumber("9876543210");
+
+        Provider provider = new Provider();
+        provider.setId(1L);
+        updatedEmployee.setProvider(provider);
+
         Employee existingEmployee = new Employee();
         existingEmployee.setFirstName("John");
         existingEmployee.setLastName("Doe");
         existingEmployee.setEmail("john.doe@example.com");
         existingEmployee.setDateOfBirth(LocalDate.of(1990, 5, 15));
         existingEmployee.setContactNumber("1234567890");
-
-        Employee updatedEmployee = new Employee();
-        updatedEmployee.setFirstName("Jane");
-        updatedEmployee.setLastName("Smith");
-        updatedEmployee.setEmail("jane.smith@example.com");
-        updatedEmployee.setDateOfBirth(LocalDate.of(1995, 7, 25));
-        updatedEmployee.setContactNumber("9876543210");
-
-        Provider provider = new Provider();
-        provider.setId(1L);
-        updatedEmployee.setProvider(provider);
+        existingEmployee.setProvider(provider);
 
         when(employeeService.getEmployeeById(employeeId)).thenReturn(Optional.of(existingEmployee));
-        when(employeeService.createEmployee(any(Employee.class))).thenReturn(updatedEmployee);
+        when(employeeService.updateEmployee(anyLong(), any(Employee.class))).thenReturn(updatedEmployee);
 
         ResponseEntity<?> response = employeeController.updateEmployee(employeeId, updatedEmployee);
 
-        verify(employeeService, times(1)).getEmployeeById(employeeId);
-        verify(employeeService, times(1)).createEmployee(any(Employee.class));
-        assert response.getStatusCode() == HttpStatus.OK;
-        assert response.getBody() instanceof Employee;
-        Employee updatedEmployeeEntity = (Employee) response.getBody();
-        assert updatedEmployeeEntity != null;
-        assert updatedEmployeeEntity.getFirstName().equals(updatedEmployee.getFirstName());
+        ArgumentCaptor<Employee> employeeCaptor = ArgumentCaptor.forClass(Employee.class);
+        verify(employeeService, times(1)).updateEmployee(eq(employeeId), employeeCaptor.capture());
+        assertEquals(updatedEmployee.getFirstName(), employeeCaptor.getValue().getFirstName());
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(updatedEmployee.getFirstName(), ((Employee) response.getBody()).getFirstName());
     }
 
     @Test
     void testUpdateEmployeeNotFound() {
-        Long employeeId = 999L;
+        Long employeeId = 1L;
         Employee updatedEmployee = new Employee();
-        updatedEmployee.setFirstName("Jane");
-        updatedEmployee.setLastName("Smith");
-        updatedEmployee.setEmail("jane.smith@example.com");
-        updatedEmployee.setDateOfBirth(LocalDate.of(1995, 7, 25));
+        updatedEmployee.setFirstName("Updated John");
+        updatedEmployee.setLastName("Updated Doe");
+        updatedEmployee.setEmail("updated.john.doe@example.com");
+        updatedEmployee.setDateOfBirth(LocalDate.of(1992, 3, 20));
         updatedEmployee.setContactNumber("9876543210");
-
-        Provider provider = new Provider();
-        provider.setId(1L);
-        updatedEmployee.setProvider(provider);
 
         when(employeeService.getEmployeeById(employeeId)).thenReturn(Optional.empty());
 
+        when(employeeService.updateEmployee(anyLong(), any(Employee.class))).thenReturn(null);
+
         ResponseEntity<?> response = employeeController.updateEmployee(employeeId, updatedEmployee);
 
-        verify(employeeService, times(1)).getEmployeeById(employeeId);
-        verify(employeeService, never()).createEmployee(any(Employee.class));
-        assert response.getStatusCode() == HttpStatus.NOT_FOUND;
+        verify(employeeService, times(1)).updateEmployee(eq(employeeId), eq(updatedEmployee));
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
     @Test
