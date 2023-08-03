@@ -26,13 +26,9 @@ public class OfferDeliveryController {
 
     @PostMapping
     public ResponseEntity<OfferDelivery> createOfferDelivery(@RequestBody OfferDelivery offerDelivery) {
-        try {
             OfferDelivery createdOfferDelivery = offerDeliveryService.createOfferDelivery(offerDelivery);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdOfferDelivery);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(null);
         }
-    }
 
     @GetMapping
     public ResponseEntity<List<OfferDelivery>> getAllOfferDeliveries() {
