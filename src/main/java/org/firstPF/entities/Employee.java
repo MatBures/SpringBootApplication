@@ -37,7 +37,6 @@ public class Employee {
             joinColumns = @JoinColumn(name = "employee_id"),
             inverseJoinColumns = @JoinColumn(name = "offer_id")
     )
-
     private Set<Offer> offers = new HashSet<>();
 
     // Getters and Setters

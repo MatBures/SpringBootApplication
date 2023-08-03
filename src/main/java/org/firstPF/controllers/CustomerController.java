@@ -1,5 +1,6 @@
 package org.firstPF.controllers;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.firstPF.entities.Customer;
 import org.firstPF.services.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,11 +45,12 @@ public class CustomerController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Customer> updateCustomer(@PathVariable Long id, @RequestBody Customer updatedCustomer) {
-        Customer updatedCustomerEntity = customerService.updateCustomer(id, updatedCustomer);
-        if (updatedCustomerEntity == null) {
+        try {
+            Customer updatedCustomerEntity = customerService.updateCustomer(id, updatedCustomer);
+            return ResponseEntity.ok(updatedCustomerEntity);
+        } catch (EntityNotFoundException ex) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-        return ResponseEntity.ok(updatedCustomerEntity);
     }
 
     @DeleteMapping("/{id}")

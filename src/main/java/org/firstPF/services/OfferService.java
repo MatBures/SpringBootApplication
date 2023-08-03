@@ -1,5 +1,6 @@
 package org.firstPF.services;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.firstPF.entities.Employee;
 import org.firstPF.entities.Offer;
 import org.firstPF.repositories.EmployeeRepository;
@@ -65,19 +66,15 @@ public class OfferService {
     }
 
     public Offer updateOffer(Long id, Offer updatedOffer) {
-        Optional<Offer> optionalOffer = getOfferById(id);
-        if (optionalOffer.isEmpty()) {
-            return null;
-        }
-
-        Offer offer = optionalOffer.get();
+        Offer offer = getOfferById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Offer with id " + id + " not found"));
 
         if (updatedOffer.getProvider() == null || updatedOffer.getProvider().getId() == null) {
-            return null;
+            throw new IllegalArgumentException("Provider data is required.");
         }
 
         if (updatedOffer.getCustomer() == null || updatedOffer.getCustomer().getId() == null) {
-            return null;
+            throw new IllegalArgumentException("Customer data is required.");
         }
 
         offer.setTitle(updatedOffer.getTitle());
@@ -89,6 +86,7 @@ public class OfferService {
 
         return offerRepository.save(offer);
     }
+
     public void deleteOffer(Long id) {
         offerRepository.deleteById(id);
     }

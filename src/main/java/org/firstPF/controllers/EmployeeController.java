@@ -1,5 +1,6 @@
 package org.firstPF.controllers;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.firstPF.entities.Employee;
 import org.firstPF.services.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,12 +44,17 @@ public class EmployeeController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateEmployee(@PathVariable Long id, @RequestBody Employee updatedEmployee) {
-        Employee updatedEmployeeEntity = employeeService.updateEmployee(id, updatedEmployee);
-        if (updatedEmployeeEntity == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        try {
+            Employee updatedEmployeeEntity = employeeService.updateEmployee(id, updatedEmployee);
+            if (updatedEmployeeEntity == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            return ResponseEntity.ok(updatedEmployeeEntity);
+        } catch (EntityNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-        return ResponseEntity.ok(updatedEmployeeEntity);
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {

@@ -1,5 +1,6 @@
 package org.firstPF.services;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.firstPF.entities.Provider;
 import org.firstPF.repositories.ProviderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,16 +31,15 @@ public class ProviderService {
     }
 
     public Provider updateProvider(Long id, Provider updatedProvider) {
-        Optional<Provider> providerOptional = providerRepository.findById(id);
-        if (providerOptional.isPresent()) {
-            Provider provider = providerOptional.get();
-            provider.setName(updatedProvider.getName());
-            provider.setAddress(updatedProvider.getAddress());
-            provider.setEmail(updatedProvider.getEmail());
-            provider.setContactNumber(updatedProvider.getContactNumber());
-            return providerRepository.save(provider);
-        }
-        return null;
+        Provider provider = providerRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Provider with id " + id + " not found"));
+
+        provider.setName(updatedProvider.getName());
+        provider.setAddress(updatedProvider.getAddress());
+        provider.setEmail(updatedProvider.getEmail());
+        provider.setContactNumber(updatedProvider.getContactNumber());
+
+        return providerRepository.save(provider);
     }
     public void deleteProvider(Long id) {
         providerRepository.deleteById(id);
