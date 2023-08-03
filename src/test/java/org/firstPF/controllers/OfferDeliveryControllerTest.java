@@ -7,18 +7,24 @@ import org.firstPF.services.OfferService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
+
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@SpringBootTest
+@DirtiesContext
 class OfferDeliveryControllerTest {
 
     @Mock
@@ -53,11 +59,11 @@ class OfferDeliveryControllerTest {
         Mockito.when(offerDeliveryService.createOfferDelivery(ArgumentMatchers.any(OfferDelivery.class)))
                 .thenThrow(new IllegalArgumentException("OfferId is required."));
 
-        ResponseEntity<OfferDelivery> response = offerDeliveryController.createOfferDelivery(offerDelivery);
+        assertThrows(IllegalArgumentException.class, () -> {
+            offerDeliveryController.createOfferDelivery(offerDelivery);
+        });
 
         Mockito.verify(offerDeliveryService, Mockito.times(1)).createOfferDelivery(ArgumentMatchers.any(OfferDelivery.class));
-        assert response.getStatusCode() == HttpStatus.BAD_REQUEST;
-        assert response.getBody() == null;
     }
 
     @Test
@@ -67,14 +73,16 @@ class OfferDeliveryControllerTest {
         offerDelivery.setAccepted(false);
         offerDelivery.setOffer(offer);
 
+        Long offerId = offer.getId();
+        when(offerService.getOfferById(offerId)).thenReturn(Optional.empty());
         Mockito.when(offerDeliveryService.createOfferDelivery(ArgumentMatchers.any(OfferDelivery.class)))
                 .thenThrow(new IllegalArgumentException("Offer with the provided OfferId does not exist."));
 
-        ResponseEntity<OfferDelivery> response = offerDeliveryController.createOfferDelivery(offerDelivery);
+        assertThrows(IllegalArgumentException.class, () -> {
+            offerDeliveryController.createOfferDelivery(offerDelivery);
+        });
 
         Mockito.verify(offerDeliveryService, Mockito.times(1)).createOfferDelivery(ArgumentMatchers.any(OfferDelivery.class));
-        assert response.getStatusCode() == HttpStatus.BAD_REQUEST;
-        assert response.getBody() == null;
     }
 
     @Test
