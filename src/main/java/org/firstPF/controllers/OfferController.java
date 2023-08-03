@@ -32,23 +32,15 @@ public class OfferController {
 
     @PostMapping
     public ResponseEntity<?> createOffer(@RequestBody Offer offer) {
-        try {
             Offer createdOffer = offerService.createOffer(offer);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdOffer);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
     }
 
     @PostMapping("/{offerId}/employees")
     public ResponseEntity<String> assignEmployeeToOffer(@PathVariable Long offerId, @RequestBody Long employeeId) {
-        try {
             offerService.assignEmployeeToOffer(offerId, employeeId);
             return ResponseEntity.ok("Employee assigned to offer successfully");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
         }
-    }
 
     @GetMapping
     public ResponseEntity<List<Offer>> getAllOffers() {

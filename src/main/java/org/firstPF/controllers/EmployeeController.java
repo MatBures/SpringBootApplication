@@ -44,17 +44,12 @@ public class EmployeeController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateEmployee(@PathVariable Long id, @RequestBody Employee updatedEmployee) {
-        try {
             Employee updatedEmployeeEntity = employeeService.updateEmployee(id, updatedEmployee);
             if (updatedEmployeeEntity == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
             return ResponseEntity.ok(updatedEmployeeEntity);
-        } catch (EntityNotFoundException ex) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-    }
-
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
