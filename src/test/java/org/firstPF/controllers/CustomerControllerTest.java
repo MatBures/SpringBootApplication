@@ -132,7 +132,7 @@ class CustomerControllerTest {
 
     @Test
     void testUpdateCustomerNotFound() {
-        Long customerId = 1L;
+        Long customerId = 95L;
         Customer updatedCustomer = new Customer();
         updatedCustomer.setName("John Doe");
         updatedCustomer.setEmail("johndoe@example.com");
