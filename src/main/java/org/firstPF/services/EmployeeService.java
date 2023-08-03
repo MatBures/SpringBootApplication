@@ -1,5 +1,6 @@
 package org.firstPF.services;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.firstPF.entities.Employee;
 import org.firstPF.repositories.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,15 +40,11 @@ public class EmployeeService {
     }
 
     public Employee updateEmployee(Long id, Employee updatedEmployee) {
-        Optional<Employee> optionalEmployee = employeeRepository.findById(id);
-        if (optionalEmployee.isEmpty()) {
-            return null;
-        }
-
-        Employee employee = optionalEmployee.get();
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Employee with id " + id + " not found"));
 
         if (updatedEmployee.getProvider() == null || updatedEmployee.getProvider().getId() == null) {
-            return null;
+            throw new IllegalArgumentException("Invalid provider data");
         }
 
         employee.setFirstName(updatedEmployee.getFirstName());
@@ -59,4 +56,5 @@ public class EmployeeService {
 
         return employeeRepository.save(employee);
     }
+
 }

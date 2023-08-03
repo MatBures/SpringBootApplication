@@ -1,5 +1,6 @@
 package org.firstPF.services;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.firstPF.entities.Offer;
 import org.firstPF.entities.OfferDelivery;
 import org.firstPF.repositories.OfferDeliveryRepository;
@@ -44,28 +45,24 @@ public class OfferDeliveryService {
     }
 
     public OfferDelivery updateOfferDelivery(Long id, OfferDelivery updatedOfferDelivery) {
-        Optional<OfferDelivery> offerDeliveryOptional = offerDeliveryRepository.findById(id);
-        if (offerDeliveryOptional.isPresent()) {
-            OfferDelivery existingOfferDelivery = offerDeliveryOptional.get();
+        OfferDelivery existingOfferDelivery = offerDeliveryRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("OfferDelivery with id " + id + " not found"));
 
-            Long offerId = updatedOfferDelivery.getOffer().getId();
-            if (offerId == null) {
-                throw new IllegalArgumentException("OfferId is required.");
-            }
-
-            Optional<Offer> existingOffer = offerService.getOfferById(offerId);
-            if (existingOffer.isEmpty()) {
-                throw new IllegalArgumentException("Offer with the provided OfferId does not exist.");
-            }
-
-            existingOfferDelivery.setDeliveryDate(updatedOfferDelivery.getDeliveryDate());
-            existingOfferDelivery.setAccepted(updatedOfferDelivery.isAccepted());
-            existingOfferDelivery.setOffer(existingOffer.get());
-
-            return offerDeliveryRepository.save(existingOfferDelivery);
+        Long offerId = updatedOfferDelivery.getOffer().getId();
+        if (offerId == null) {
+            throw new IllegalArgumentException("OfferId is required.");
         }
-        return null;
+
+        Offer existingOffer = offerService.getOfferById(offerId)
+                .orElseThrow(() -> new IllegalArgumentException("Offer with the provided OfferId does not exist."));
+
+        existingOfferDelivery.setDeliveryDate(updatedOfferDelivery.getDeliveryDate());
+        existingOfferDelivery.setAccepted(updatedOfferDelivery.isAccepted());
+        existingOfferDelivery.setOffer(existingOffer);
+
+        return offerDeliveryRepository.save(existingOfferDelivery);
     }
+
     public void deleteOfferDelivery(Long id) {
         offerDeliveryRepository.deleteById(id);
     }
