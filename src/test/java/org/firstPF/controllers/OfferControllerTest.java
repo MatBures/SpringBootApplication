@@ -1,7 +1,6 @@
 package org.firstPF.controllers;
 
 import org.firstPF.entities.Customer;
-import org.firstPF.entities.Employee;
 import org.firstPF.entities.Offer;
 import org.firstPF.entities.Provider;
 import org.firstPF.repositories.EmployeeRepository;
@@ -10,20 +9,22 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@SpringBootTest
+@DirtiesContext
 class OfferControllerTest {
 
     @Mock
@@ -68,12 +69,9 @@ class OfferControllerTest {
         when(offerService.createOffer(any(Offer.class)))
                 .thenThrow(new IllegalArgumentException("ProviderId is required."));
 
-        ResponseEntity<?> response = offerController.createOffer(offer);
+        assertThrows(IllegalArgumentException.class, () -> offerController.createOffer(offer));
 
         verify(offerService, times(1)).createOffer(any(Offer.class));
-        assert response.getStatusCode() == HttpStatus.BAD_REQUEST;
-        assert response.getBody() instanceof String;
-        assert response.getBody().equals("ProviderId is required.");
     }
 
     @Test
@@ -88,12 +86,9 @@ class OfferControllerTest {
         when(offerService.createOffer(any(Offer.class)))
                 .thenThrow(new IllegalArgumentException("CustomerId is required."));
 
-        ResponseEntity<?> response = offerController.createOffer(offer);
+        assertThrows(IllegalArgumentException.class, () -> offerController.createOffer(offer));
 
         verify(offerService, times(1)).createOffer(any(Offer.class));
-        assert response.getStatusCode() == HttpStatus.BAD_REQUEST;
-        assert response.getBody() instanceof String;
-        assert response.getBody().equals("CustomerId is required.");
     }
 
     @Test
@@ -306,15 +301,15 @@ class OfferControllerTest {
         Long invalidOfferId = 999L;
         Long employeeId = 2L;
 
-        Mockito.doThrow(new IllegalArgumentException("Offer doesn't exist."))
+        doThrow(new IllegalArgumentException("Offer doesn't exist."))
                 .when(offerService).assignEmployeeToOffer(invalidOfferId, employeeId);
 
-        ResponseEntity<String> response = offerController.assignEmployeeToOffer(invalidOfferId, employeeId);
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> offerController.assignEmployeeToOffer(invalidOfferId, employeeId));
 
         verify(offerService, times(1)).assignEmployeeToOffer(invalidOfferId, employeeId);
-        assert response.getStatusCode() == HttpStatus.BAD_REQUEST;
-        assert response.getBody() instanceof String;
-        assert response.getBody().equals("Offer doesn't exist.");
+
+        assertEquals("Offer doesn't exist.", exception.getMessage());
     }
 
     @Test
@@ -322,14 +317,11 @@ class OfferControllerTest {
         Long offerId = 1L;
         Long invalidEmployeeId = 999L;
 
-        Mockito.doThrow(new IllegalArgumentException("Employee doesn't exist."))
+        doThrow(new IllegalArgumentException("Employee doesn't exist."))
                 .when(offerService).assignEmployeeToOffer(offerId, invalidEmployeeId);
 
-        ResponseEntity<String> response = offerController.assignEmployeeToOffer(offerId, invalidEmployeeId);
+        assertThrows(IllegalArgumentException.class, () -> offerController.assignEmployeeToOffer(offerId, invalidEmployeeId));
 
         verify(offerService, times(1)).assignEmployeeToOffer(offerId, invalidEmployeeId);
-        assert response.getStatusCode() == HttpStatus.BAD_REQUEST;
-        assert response.getBody() instanceof String;
-        assert response.getBody().equals("Employee doesn't exist.");
     }
 }
