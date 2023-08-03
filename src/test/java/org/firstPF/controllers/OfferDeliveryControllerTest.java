@@ -11,7 +11,6 @@ import org.mockito.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.annotation.DirtiesContext;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -24,7 +23,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
-@DirtiesContext
 class OfferDeliveryControllerTest {
 
     @Mock

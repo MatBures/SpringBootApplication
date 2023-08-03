@@ -24,7 +24,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
-@DirtiesContext
 class EmployeeControllerTest {
 
     @Mock
